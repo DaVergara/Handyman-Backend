@@ -43,7 +43,7 @@ public class AppointmentRepositoryImplementation implements AppointmentRepositor
 
     @Override
     public List<Appointment> getAppointmentsByTechnicianId(String technicianId) {
-        String sqlQuery = "select * from tbl_appointments where technician_id = ?";
+        String sqlQuery = "select * from tbl_appointments where technician_id = ? order by service_started ASC";
         return jdbcTemplate.query(sqlQuery, rowMapper, technicianId);
     }
 

@@ -5,6 +5,7 @@ import com.david.handymanworkinghourscalculator.service.AppointmentService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -34,8 +35,12 @@ public class AppointmentController {
 
     @PostMapping
     public ResponseEntity<Appointment> addAppointment(@RequestBody Appointment appointment) {
-        Appointment addedAppointment = service.addApoAppointment(appointment);
-        return new ResponseEntity<>(addedAppointment, HttpStatus.OK);
+        try {
+            Appointment addedAppointment = service.addApoAppointment(appointment);
+            return new ResponseEntity<>(addedAppointment, HttpStatus.OK);
+        } catch (Exception exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, exception.getMessage(), exception);
+        }
     }
 
 }

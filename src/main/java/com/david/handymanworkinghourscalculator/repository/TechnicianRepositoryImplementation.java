@@ -36,8 +36,8 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository{
 
     @Override
     public Technician getTechnicianById(String technicianId) {
-        String sqlQuery = "select * from tbl_technicians where technician_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, rowMapper, technicianId);
+            String sqlQuery = "select * from tbl_technicians where technician_id = ?";
+            return jdbcTemplate.queryForObject(sqlQuery, rowMapper, technicianId);
     }
 
     @Override

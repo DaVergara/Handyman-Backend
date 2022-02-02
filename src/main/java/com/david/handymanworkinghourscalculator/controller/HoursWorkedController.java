@@ -29,7 +29,7 @@ public class HoursWorkedController {
             HoursWorked hoursWorked = service.getHoursWorked(technicianId, weekNumber);
             return new ResponseEntity<>(hoursWorked, HttpStatus.OK);
         } catch (TechnicianNotFoundException exception) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Technician Not Found", exception);
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
         }
     }
 

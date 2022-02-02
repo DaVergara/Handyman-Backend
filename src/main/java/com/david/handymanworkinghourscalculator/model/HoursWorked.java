@@ -5,17 +5,17 @@ import java.util.HashMap;
 
 public class HoursWorked {
 
-    private HashMap<String, BigDecimal> hoursWorked;
+    private HashMap<String, Integer> hoursWorked;
 
-    public HoursWorked(HashMap<String, BigDecimal> hoursWorked) {
+    public HoursWorked(HashMap<String, Integer> hoursWorked) {
         this.hoursWorked = hoursWorked;
     }
 
-    public HashMap<String, BigDecimal> getHoursWorked() {
+    public HashMap<String, Integer> getHoursWorked() {
         return hoursWorked;
     }
 
-    public void setHoursWorked(HashMap<String, BigDecimal> hoursWorked) {
+    public void setHoursWorked(HashMap<String, Integer> hoursWorked) {
         this.hoursWorked = hoursWorked;
     }
 }

@@ -1,8 +1,8 @@
 package com.david.handymanworkinghourscalculator.controller;
 
-import com.david.handymanworkinghourscalculator.exception.TechnicianNotFoundException;
 import com.david.handymanworkinghourscalculator.model.Technician;
 import com.david.handymanworkinghourscalculator.service.TechnicianService;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -32,8 +32,8 @@ public class TechnicianController {
         try {
             Technician technician = service.getTechnicianById(technicianId);
             return new ResponseEntity<>(technician, HttpStatus.OK);
-        } catch (TechnicianNotFoundException exception) {
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "No seas puto", exception);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Technician not found.", exception);
         }
     }
 

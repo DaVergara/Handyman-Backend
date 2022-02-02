@@ -3,12 +3,10 @@ package com.david.handymanworkinghourscalculator.service;
 import com.david.handymanworkinghourscalculator.exception.TechnicianNotFoundException;
 import com.david.handymanworkinghourscalculator.model.Appointment;
 import com.david.handymanworkinghourscalculator.model.HoursWorked;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.stereotype.Service;
 
-import java.math.BigDecimal;
-import java.math.RoundingMode;
-import java.time.Duration;
-import java.time.LocalTime;
+import java.time.*;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.List;
@@ -28,63 +26,73 @@ public class HoursWorkedService {
     public HoursWorked getHoursWorked(String technicianId, int weekNumber) {
 
         if (validateIfTechnicianExist(technicianId)) {
+            HashMap<String, Integer> hoursWorkedMap = new HashMap<>();
+            hoursWorkedMap.put("Horas Normales", 0);
+            hoursWorkedMap.put("Horas Nocturnas", 0);
+            hoursWorkedMap.put("Horas Dominicales", 0);
+            hoursWorkedMap.put("Horas Normales Extra", 0);
+            hoursWorkedMap.put("Horas Nocturnas Extra", 0);
+            hoursWorkedMap.put("Horas Dominicales Extra", 0);
 
-            HashMap<String, BigDecimal> hoursWorkedMap = new HashMap<>();
+            List<Appointment> appointments = getAppointmentsOfWeek(
+                    appointmentService.getAppointmentsByTechnicianId(technicianId), weekNumber
+            );
 
-            hoursWorkedMap.put("Horas Normales", BigDecimal.ZERO);
-            hoursWorkedMap.put("Horas Nocturnas", BigDecimal.ZERO);
-            hoursWorkedMap.put("Horas Dominicales", BigDecimal.ZERO);
-            hoursWorkedMap.put("Horas Normales Extra", BigDecimal.ZERO);
-            hoursWorkedMap.put("Horas Nocturnas Extra", BigDecimal.ZERO);
-            hoursWorkedMap.put("Horas Dominicales Extra", BigDecimal.ZERO);
-
-            List<Appointment> appointments = appointmentService.getAppointmentsByTechnicianId(technicianId);
-            appointments = getAppointmentsOfWeek(appointments, weekNumber);
-
-            if (appointments.size() == 0) {
-                HoursWorked hoursWorked = new HoursWorked(hoursWorkedMap);
-                return  hoursWorked;
-            } else {
-                appointments.forEach(appointment -> {
-                    if (isSunday(appointment)) {
-                        BigDecimal hoursWorkedValue = addHoursWorked(
-                                hoursWorkedMap, "Horas Dominicales", appointment
-                        );
-                        hoursWorkedMap.replace("Horas Dominicales", hoursWorkedValue);
-                    } else {
-                        if (isDaytimeHours(appointment)) {
-                            System.out.println(appointment.getServiceStarted());
-                            System.out.println("Dia");
-                            BigDecimal hoursWorkedValue = addHoursWorked(
-                                    hoursWorkedMap, "Horas Normales", appointment
+            appointments.forEach(appointment -> {
+                Duration duration = Duration.between(
+                        appointment.getServiceStarted(), appointment.getServiceFinished()
+                );
+                int hoursWorked = (int) duration.toHours();
+                int i = 0;
+                while (i != hoursWorked) {
+                    if (isOvertime(hoursWorkedMap)) {
+                        if (isSunday(appointment.getServiceStarted().plusHours(i))) {
+                            addHoursWorked(
+                                    hoursWorkedMap,
+                                    "Horas Dominicales Extra"
                             );
-                            hoursWorkedMap.replace("Horas Normales", hoursWorkedValue);
+                        } else if (isDaytimeHours(appointment.getServiceStarted().plusHours(i))) {
+                            addHoursWorked(
+                                    hoursWorkedMap,
+                                    "Horas Normales Extra"
+                            );
                         } else {
-                            System.out.println(appointment.getServiceStarted());
-                            System.out.println("Noche");
-                            BigDecimal hoursWorkedValue = addHoursWorked(
-                                    hoursWorkedMap, "Horas Nocturnas", appointment
+                            addHoursWorked(
+                                    hoursWorkedMap,
+                                    "Horas Nocturnas Extra"
                             );
-                            hoursWorkedMap.replace("Horas Nocturnas", hoursWorkedValue);
+                        }
+                    } else {
+                        if (isSunday(appointment.getServiceStarted().plusHours(i))) {
+                            addHoursWorked(
+                                    hoursWorkedMap,
+                                    "Horas Dominicales"
+                            );
+                        } else if (isDaytimeHours(appointment.getServiceStarted().plusHours(i))) {
+                            addHoursWorked(
+                                    hoursWorkedMap,
+                                    "Horas Normales"
+                            );
+                        } else {
+                            addHoursWorked(
+                                    hoursWorkedMap,
+                                    "Horas Nocturnas"
+                            );
                         }
                     }
-                });
-            }
-
-            //System.out.println(time);
-
-            HoursWorked hoursWorked = new HoursWorked(hoursWorkedMap);
-
-            return hoursWorked;
-        } else {
-            throw new TechnicianNotFoundException("Technician Not Found");
+                    i++;
+                }
+            });
+            return new HoursWorked(hoursWorkedMap);
         }
+
+        throw new TechnicianNotFoundException("Technician not found");
     }
 
     private boolean validateIfTechnicianExist(String technicianId) {
         try {
             return technicianService.getTechnicianById(technicianId) != null;
-        } catch (TechnicianNotFoundException exception) {
+        } catch (EmptyResultDataAccessException exception) {
             return false;
         }
     }
@@ -94,38 +102,57 @@ public class HoursWorkedService {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_WEEK_DATE;
 
         appointments = appointments.stream().filter(appointment -> {
-            String[] strings = formatter.format(appointment.getServiceStarted()).split("-");
-            return Integer.parseInt(strings[1].replace("W", "")) == weekNumber;
-        }).collect(Collectors.toList());
+                    String[] serviceStarted = formatter.format(appointment.getServiceStarted()).split("-");
+                    String[] serviceFinished = formatter.format(appointment.getServiceFinished()).split("-");
+                    return Integer.parseInt(serviceStarted[1].replace("W", "")) == weekNumber
+                            || Integer.parseInt(serviceFinished[1].replace("W", "")) == weekNumber;
+                }).map(appointment -> {
+                    String[] serviceStarted = formatter.format(appointment.getServiceStarted()).split("-");
+                    if (Integer.parseInt(serviceStarted[1].replace("W", "")) != weekNumber) {
+                        appointment.setServiceStarted(
+                                (String.valueOf(weekNumber).length() == 1) ?
+                                        LocalDate.parse("2022-W0" + weekNumber + "-1", formatter).atTime(LocalTime.MIN) :
+                                        LocalDate.parse("2022-W" + weekNumber + "-1", formatter).atTime(LocalTime.MIN)
+                        );
+                    }
+                    String[] serviceFinished = formatter.format(appointment.getServiceFinished()).split("-");
+                    if (Integer.parseInt(serviceFinished[1].replace("W", "")) != weekNumber) {
+                        appointment.setServiceFinished(
+                                (String.valueOf(weekNumber + 1).length() == 1) ?
+                                        LocalDate.parse("2022-W0" + (weekNumber + 1) + "-1", formatter).atTime(LocalTime.MIN) :
+                                        LocalDate.parse("2022-W" + (weekNumber + 1) + "-1", formatter).atTime(LocalTime.MIN)
+                        );
+                    }
+                    return appointment;
+                })
+                .collect(Collectors.toList());
+
         return appointments;
     }
 
-    private boolean isSunday(Appointment appointment) {
+    private boolean isOvertime(HashMap<String, Integer> hoursWorkedMap) {
+        int weekTotalHours = hoursWorkedMap.get("Horas Normales") +
+                hoursWorkedMap.get("Horas Nocturnas") +
+                hoursWorkedMap.get("Horas Dominicales");
+        return weekTotalHours == 48;
+    }
+
+    private boolean isSunday(LocalDateTime dateTime) {
         DateTimeFormatter formatter = DateTimeFormatter.ISO_WEEK_DATE;
-        String[] strings = formatter.format(appointment.getServiceStarted()).split("-");
+        String[] strings = formatter.format(dateTime).split("-");
         return Integer.parseInt(strings[2]) == 7;
     }
 
-    private boolean isDaytimeHours(Appointment appointment) {
-        System.out.println(appointment.getServiceStarted().toLocalTime());
-        System.out.println(appointment.getServiceStarted().toLocalTime().isAfter(LocalTime.of(6, 59, 59))
-                && appointment.getServiceStarted().toLocalTime().isBefore(LocalTime.of(20, 0, 1)));
-        return appointment.getServiceStarted().toLocalTime().isAfter(LocalTime.of(6, 59, 59))
-                && appointment.getServiceStarted().toLocalTime().isBefore(LocalTime.of(20, 0, 1));
+    private boolean isDaytimeHours(LocalDateTime dateTime) {
+        return dateTime.toLocalTime().isAfter(LocalTime.of(6, 59, 59))
+                && dateTime.toLocalTime().isBefore(LocalTime.of(20, 0, 0));
     }
 
-    private BigDecimal addHoursWorked(
-            HashMap<String, BigDecimal> hoursWorkedMap,
-            String hoursWorkedMapKey,
-            Appointment appointment
+    private void addHoursWorked(
+            HashMap<String, Integer> hoursWorkedMap,
+            String hoursWorkedMapKey
     ) {
-        BigDecimal hoursWorkedValue = hoursWorkedMap.get(hoursWorkedMapKey);
-        Duration duration = Duration.between(
-                appointment.getServiceStarted(), appointment.getServiceFinished()
-        );
-        BigDecimal appointmentHoursWorked = BigDecimal.valueOf(Math.abs(duration.toMinutes())/60d)
-                .setScale(2, RoundingMode.UP);
-        hoursWorkedValue = hoursWorkedValue.add(appointmentHoursWorked);
-        return hoursWorkedValue;
+        Integer hoursWorkedValue = hoursWorkedMap.get(hoursWorkedMapKey);
+        hoursWorkedMap.replace(hoursWorkedMapKey, hoursWorkedValue + 1);
     }
 }

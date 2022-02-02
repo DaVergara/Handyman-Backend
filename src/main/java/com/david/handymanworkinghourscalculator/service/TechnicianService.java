@@ -20,7 +20,7 @@ public class TechnicianService {
     }
 
     public Technician getTechnicianById(String technicianId) {
-        return repository.getTechnicianById(technicianId);
+            return repository.getTechnicianById(technicianId);
     }
 
     public Technician addTechnician(Technician technician) {
