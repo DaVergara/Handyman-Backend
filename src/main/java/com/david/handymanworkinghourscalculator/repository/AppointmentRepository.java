@@ -10,6 +10,12 @@ public interface AppointmentRepository {
 
     List<Appointment> getAppointmentsByTechnicianId(String technicianId);
 
+    Appointment getAppointmentByServiceId(String serviceId);
+
     void addAppointment(Appointment appointment);
+
+    void updateAppointment(Appointment appointment);
+
+    void deleteAppointment(String serviceIdId);
 
 }

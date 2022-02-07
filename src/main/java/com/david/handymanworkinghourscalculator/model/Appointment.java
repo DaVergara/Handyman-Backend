@@ -13,14 +13,8 @@ public class Appointment {
     public Appointment(String technicianId, String serviceId, LocalDateTime serviceStarted, LocalDateTime serviceFinished) {
 
         Objects.requireNonNull(technicianId, "Technician id is required.");
-        Objects.requireNonNull(serviceId, "Service id is required.");
         Objects.requireNonNull(serviceStarted, "Service start date is required.");
         Objects.requireNonNull(serviceFinished, "Service end date is required.");
-
-        if (serviceStarted.isAfter(serviceFinished)
-                || serviceStarted.isEqual(serviceFinished)) {
-            throw new IllegalArgumentException("Service end date must be later than the service start date.");
-        }
 
         this.technicianId = technicianId;
         this.serviceId = serviceId;

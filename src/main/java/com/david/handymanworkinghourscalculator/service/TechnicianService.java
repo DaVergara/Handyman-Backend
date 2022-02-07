@@ -24,6 +24,7 @@ public class TechnicianService {
     }
 
     public Technician addTechnician(Technician technician) {
+
         repository.addTechnician(technician);
         return repository.getTechnicianById(technician.getTechnicianId());
     }

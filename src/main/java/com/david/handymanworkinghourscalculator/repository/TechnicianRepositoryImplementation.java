@@ -1,6 +1,7 @@
 package com.david.handymanworkinghourscalculator.repository;
 
 import com.david.handymanworkinghourscalculator.model.Technician;
+import org.springframework.dao.DuplicateKeyException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -8,7 +9,7 @@ import org.springframework.stereotype.Repository;
 import java.util.List;
 
 @Repository
-public class TechnicianRepositoryImplementation implements TechnicianRepository{
+public class TechnicianRepositoryImplementation implements TechnicianRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -17,15 +18,15 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository{
     }
 
     private final RowMapper<Technician> rowMapper = (resultSet, rowNum) -> {
-      String technicianId = resultSet.getString("technician_id");
-      String technicianName = resultSet.getString("technician_name");
-      String technicianLastName = resultSet.getString("technician_lastname");
+        String technicianId = resultSet.getString("technician_id");
+        String technicianName = resultSet.getString("technician_name");
+        String technicianLastName = resultSet.getString("technician_lastname");
 
-      return new Technician(
-              technicianId,
-              technicianName,
-              technicianLastName
-      );
+        return new Technician(
+                technicianId,
+                technicianName,
+                technicianLastName
+        );
     };
 
     @Override
@@ -36,11 +37,12 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository{
 
     @Override
     public Technician getTechnicianById(String technicianId) {
-            String sqlQuery = "select * from tbl_technicians where technician_id = ?";
-            return jdbcTemplate.queryForObject(sqlQuery, rowMapper, technicianId);
+        String sqlQuery = "select * from tbl_technicians where technician_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, rowMapper, technicianId);
     }
 
     @Override
+
     public void addTechnician(Technician technician) {
         String sqlQuery =
                 "insert into tbl_technicians(technician_id, technician_name, technician_lastname) " +

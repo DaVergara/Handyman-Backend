@@ -39,14 +39,27 @@ public class TechnicianController {
 
     @PostMapping
     public ResponseEntity<Technician> addTechnician(@RequestBody Technician technician) {
-        Technician addedTechnician = service.addTechnician(technician);
-        return new ResponseEntity<>(addedTechnician, HttpStatus.OK);
+        try {
+            Technician addedTechnician = service.addTechnician(technician);
+            return new ResponseEntity<>(addedTechnician, HttpStatus.OK);
+        } catch (Exception exception) {
+            System.out.println("Hola");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Technician with id: " + technician.getTechnicianId() + " already exist.",
+                    exception);
+        }
     }
 
     @PutMapping
     public ResponseEntity<Technician> updateTechnician(@RequestBody Technician technician) {
-        Technician updatedTechnician = service.updateTechnician(technician);
-        return new ResponseEntity<>(updatedTechnician, HttpStatus.OK);
+        try {
+            Technician updatedTechnician = service.updateTechnician(technician);
+            return new ResponseEntity<>(updatedTechnician, HttpStatus.OK);
+        } catch (EmptyResultDataAccessException exception) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
+                    "Technician with id: " + technician.getTechnicianId() + " not found.",
+                    exception);
+        }
     }
 
     @DeleteMapping("/{technicianId}")

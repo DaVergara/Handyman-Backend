@@ -97,7 +97,7 @@ public class HoursWorkedService {
         }
     }
 
-    private List<Appointment> getAppointmentsOfWeek(List<Appointment> appointments, int weekNumber) {
+    public List<Appointment> getAppointmentsOfWeek(List<Appointment> appointments, int weekNumber) {
 
         DateTimeFormatter formatter = DateTimeFormatter.ISO_WEEK_DATE;
 

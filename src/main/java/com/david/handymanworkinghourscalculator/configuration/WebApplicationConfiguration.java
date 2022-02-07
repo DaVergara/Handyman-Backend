@@ -11,7 +11,7 @@ public class WebApplicationConfiguration implements WebMvcConfigurer {
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
                 .allowedMethods("OPTIONS", "GET", "POST", "PUT", "DELETE")
-                .allowedOrigins("htt;//localhost:4200")
+                .allowedOrigins("http://localhost:4200")
                 .allowedHeaders("*");
     }
 }
