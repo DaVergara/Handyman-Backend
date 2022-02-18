@@ -1,6 +1,9 @@
 package com.david.handymanworkinghourscalculator.repository;
 
-import com.david.handymanworkinghourscalculator.model.Appointment;
+import com.david.handymanworkinghourscalculator.domain.appointment.Appointment;
+import com.david.handymanworkinghourscalculator.domain.appointment.AppointmentId;
+import com.david.handymanworkinghourscalculator.domain.appointment.WeekNumber;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianId;
 
 import java.util.List;
 
@@ -8,14 +11,16 @@ public interface AppointmentRepository {
 
     List<Appointment> getAllAppointments();
 
-    List<Appointment> getAppointmentsByTechnicianId(String technicianId);
+    List<Appointment> getAppointmentsByTechnicianId(TechnicianId technicianId);
 
-    Appointment getAppointmentByServiceId(String serviceId);
+    List<Appointment> getAppointmentsByTechnicianIdWeekNumber(TechnicianId technicianId, WeekNumber weekNumber);
+
+    Appointment getAppointmentByAppointmentId(AppointmentId appointmentId);
 
     void addAppointment(Appointment appointment);
 
     void updateAppointment(Appointment appointment);
 
-    void deleteAppointment(String serviceIdId);
+    void deleteAppointment(AppointmentId appointmentId);
 
 }

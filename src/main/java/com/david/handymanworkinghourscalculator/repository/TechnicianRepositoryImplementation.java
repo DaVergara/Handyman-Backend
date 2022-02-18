@@ -1,7 +1,9 @@
 package com.david.handymanworkinghourscalculator.repository;
 
-import com.david.handymanworkinghourscalculator.model.Technician;
-import org.springframework.dao.DuplicateKeyException;
+import com.david.handymanworkinghourscalculator.domain.technician.Technician;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianId;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianLastName;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianName;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.RowMapper;
 import org.springframework.stereotype.Repository;
@@ -18,9 +20,9 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository 
     }
 
     private final RowMapper<Technician> rowMapper = (resultSet, rowNum) -> {
-        String technicianId = resultSet.getString("technician_id");
-        String technicianName = resultSet.getString("technician_name");
-        String technicianLastName = resultSet.getString("technician_lastname");
+        TechnicianId technicianId = new TechnicianId(resultSet.getString("technician_id"));
+        TechnicianName technicianName = new TechnicianName(resultSet.getString("technician_name"));
+        TechnicianLastName technicianLastName = new TechnicianLastName(resultSet.getString("technician_lastname"));
 
         return new Technician(
                 technicianId,
@@ -36,9 +38,9 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository 
     }
 
     @Override
-    public Technician getTechnicianById(String technicianId) {
+    public Technician getTechnicianById(TechnicianId technicianId) {
         String sqlQuery = "select * from tbl_technicians where technician_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, rowMapper, technicianId);
+        return jdbcTemplate.queryForObject(sqlQuery, rowMapper, technicianId.toString());
     }
 
     @Override
@@ -48,9 +50,9 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository 
                 "insert into tbl_technicians(technician_id, technician_name, technician_lastname) " +
                         "values(?, ?, ?)";
         jdbcTemplate.update(sqlQuery, ps -> {
-            ps.setString(1, technician.getTechnicianId());
-            ps.setString(2, technician.getTechnicianName());
-            ps.setString(3, technician.getTechnicianLastName());
+            ps.setString(1, technician.getTechnicianId().toString());
+            ps.setString(2, technician.getTechnicianName().toString());
+            ps.setString(3, technician.getTechnicianLastName().toString());
         });
     }
 
@@ -59,15 +61,15 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository 
         String sqlQuery =
                 "update tbl_technicians set technician_name = ?, technician_lastname = ? where technician_id = ?";
         jdbcTemplate.update(sqlQuery, ps -> {
-            ps.setString(1, technician.getTechnicianName());
-            ps.setString(2, technician.getTechnicianLastName());
-            ps.setString(3, technician.getTechnicianId());
+            ps.setString(1, technician.getTechnicianName().toString());
+            ps.setString(2, technician.getTechnicianLastName().toString());
+            ps.setString(3, technician.getTechnicianId().toString());
         });
     }
 
     @Override
-    public void deleteTechnician(String technicianId) {
+    public void deleteTechnician(TechnicianId technicianId) {
         String sqlQuery = "delete from tbl_technicians where technician_id = ?";
-        jdbcTemplate.update(sqlQuery, technicianId);
+        jdbcTemplate.update(sqlQuery, technicianId.toString());
     }
 }

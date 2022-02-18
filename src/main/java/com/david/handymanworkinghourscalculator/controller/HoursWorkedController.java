@@ -1,8 +1,10 @@
 package com.david.handymanworkinghourscalculator.controller;
 
+import com.david.handymanworkinghourscalculator.domain.appointment.WeekNumber;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianId;
 import com.david.handymanworkinghourscalculator.exception.TechnicianNotFoundException;
-import com.david.handymanworkinghourscalculator.model.Appointment;
-import com.david.handymanworkinghourscalculator.model.HoursWorked;
+import com.david.handymanworkinghourscalculator.domain.appointment.Appointment;
+import com.david.handymanworkinghourscalculator.domain.HoursWorked;
 import com.david.handymanworkinghourscalculator.service.AppointmentService;
 import com.david.handymanworkinghourscalculator.service.HoursWorkedService;
 import org.springframework.http.HttpStatus;
@@ -29,23 +31,14 @@ public class HoursWorkedController {
 
     @GetMapping("/technician/{technicianId}/week/{weekNumber}")
     ResponseEntity<HoursWorked> getHoursWorked(
-            @PathVariable("technicianId") String technicianId, @PathVariable("weekNumber") int weekNumber
+            @PathVariable("technicianId") TechnicianId technicianId, @PathVariable("weekNumber") int weekNumber
     ) {
         try {
-            HoursWorked hoursWorked = hoursWorkedService.getHoursWorked(technicianId, weekNumber);
+            HoursWorked hoursWorked = hoursWorkedService.getHoursWorked(technicianId, new WeekNumber(weekNumber));
             return new ResponseEntity<>(hoursWorked, HttpStatus.OK);
         } catch (TechnicianNotFoundException exception) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
         }
-    }
-
-    @GetMapping("/appointments/technician/{technicianId}/week/{weekNumber}")
-    ResponseEntity<List<Appointment>> getAppointmentsOfWeek(
-            @PathVariable("technicianId") String technicianId, @PathVariable("weekNumber") int weekNumber
-    ) {
-        List<Appointment> appointments = appointmentService.getAppointmentsByTechnicianId(technicianId);
-        List<Appointment> appointmentsOfWeek = hoursWorkedService.getAppointmentsOfWeek(appointments, weekNumber);
-        return new ResponseEntity<>(appointmentsOfWeek, HttpStatus.OK);
     }
 
 }

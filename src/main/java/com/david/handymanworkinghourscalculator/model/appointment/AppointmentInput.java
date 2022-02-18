@@ -1,25 +1,39 @@
-package com.david.handymanworkinghourscalculator.model;
+package com.david.handymanworkinghourscalculator.model.appointment;
 
 import java.time.LocalDateTime;
-import java.util.Objects;
 
-public class Appointment {
+public class AppointmentInput {
 
+    private String appointmentId;
     private String technicianId;
     private String serviceId;
     private LocalDateTime serviceStarted;
     private LocalDateTime serviceFinished;
 
-    public Appointment(String technicianId, String serviceId, LocalDateTime serviceStarted, LocalDateTime serviceFinished) {
+    public AppointmentInput() {
+    }
 
-        Objects.requireNonNull(technicianId, "Technician id is required.");
-        Objects.requireNonNull(serviceStarted, "Service start date is required.");
-        Objects.requireNonNull(serviceFinished, "Service end date is required.");
-
+    public AppointmentInput(String appointmentId, String technicianId, String serviceId, LocalDateTime serviceStarted, LocalDateTime serviceFinished) {
+        this.appointmentId = appointmentId;
         this.technicianId = technicianId;
         this.serviceId = serviceId;
         this.serviceStarted = serviceStarted;
         this.serviceFinished = serviceFinished;
+    }
+
+    public AppointmentInput(String technicianId, String serviceId, LocalDateTime serviceStarted, LocalDateTime serviceFinished) {
+        this.technicianId = technicianId;
+        this.serviceId = serviceId;
+        this.serviceStarted = serviceStarted;
+        this.serviceFinished = serviceFinished;
+    }
+
+    public String getAppointmentId() {
+        return appointmentId;
+    }
+
+    public void setAppointmentId(String appointmentId) {
+        this.appointmentId = appointmentId;
     }
 
     public String getTechnicianId() {

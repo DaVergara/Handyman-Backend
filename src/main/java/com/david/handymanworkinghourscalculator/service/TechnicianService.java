@@ -1,6 +1,7 @@
 package com.david.handymanworkinghourscalculator.service;
 
-import com.david.handymanworkinghourscalculator.model.Technician;
+import com.david.handymanworkinghourscalculator.domain.technician.Technician;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianId;
 import com.david.handymanworkinghourscalculator.repository.TechnicianRepository;
 import org.springframework.stereotype.Service;
 
@@ -19,7 +20,7 @@ public class TechnicianService {
         return repository.getAllTechnicians();
     }
 
-    public Technician getTechnicianById(String technicianId) {
+    public Technician getTechnicianById(TechnicianId technicianId) {
             return repository.getTechnicianById(technicianId);
     }
 
@@ -34,7 +35,7 @@ public class TechnicianService {
         return repository.getTechnicianById(technician.getTechnicianId());
     }
 
-    public void deleteTechnician(String technicianId) {
+    public void deleteTechnician(TechnicianId technicianId) {
         repository.deleteTechnician(technicianId);
     }
 }

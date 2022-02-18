@@ -1,16 +1,14 @@
 package com.david.handymanworkinghourscalculator.repository;
 
-import com.david.handymanworkinghourscalculator.model.Appointment;
+import com.david.handymanworkinghourscalculator.domain.appointment.Appointment;
+import com.david.handymanworkinghourscalculator.domain.appointment.AppointmentId;
+import com.david.handymanworkinghourscalculator.domain.appointment.WeekNumber;
+import com.david.handymanworkinghourscalculator.domain.service.ServiceId;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianId;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.core.PreparedStatementCreator;
 import org.springframework.jdbc.core.RowMapper;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.stereotype.Repository;
 
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.List;
@@ -28,16 +26,20 @@ public class AppointmentRepositoryImplementation implements AppointmentRepositor
 
         DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
 
-        String technicianId = resultSet.getString("technician_id");
-        String serviceId = resultSet.getString("service_id");
+        AppointmentId appointmentId = new AppointmentId(resultSet.getString("appointment_id"));
+        TechnicianId technicianId = new TechnicianId(resultSet.getString("technician_id"));
+        ServiceId serviceId = new ServiceId(resultSet.getString("service_id"));
         LocalDateTime serviceStarted = LocalDateTime.parse(resultSet.getString("service_started"), formatter);
         LocalDateTime serviceFinished = LocalDateTime.parse(resultSet.getString("service_finished"), formatter);
+        WeekNumber weekNumber = new WeekNumber(resultSet.getInt("week_number"));
 
         return new Appointment(
+                appointmentId,
                 technicianId,
                 serviceId,
                 serviceStarted,
-                serviceFinished
+                serviceFinished,
+                weekNumber
         );
     };
 
@@ -48,44 +50,53 @@ public class AppointmentRepositoryImplementation implements AppointmentRepositor
     }
 
     @Override
-    public List<Appointment> getAppointmentsByTechnicianId(String technicianId) {
+    public List<Appointment> getAppointmentsByTechnicianId(TechnicianId technicianId) {
         String sqlQuery = "select * from tbl_appointments where technician_id = ? order by service_started ASC";
-        return jdbcTemplate.query(sqlQuery, rowMapper, technicianId);
+        return jdbcTemplate.query(sqlQuery, rowMapper, technicianId.toString());
     }
 
     @Override
-    public Appointment getAppointmentByServiceId(String serviceId) {
-        String sqlQuery = "select * from tbl_appointments where service_id = ?";
-        return jdbcTemplate.queryForObject(sqlQuery, rowMapper, serviceId);
+    public List<Appointment> getAppointmentsByTechnicianIdWeekNumber(TechnicianId technicianId, WeekNumber weekNumber) {
+        String sqlQuery = "select * from tbl_appointments where technician_id = ? and week_number = ? order by service_started ASC";
+        return jdbcTemplate.query(sqlQuery, rowMapper, technicianId.toString(), weekNumber.asInteger());
+    }
+
+    @Override
+    public Appointment getAppointmentByAppointmentId(AppointmentId appointmentId) {
+        String sqlQuery = "select * from tbl_appointments where appointment_id = ?";
+        return jdbcTemplate.queryForObject(sqlQuery, rowMapper, appointmentId.toString());
     }
 
     @Override
     public void addAppointment(Appointment appointment) {
         String sqlQuery =
-                "insert into tbl_appointments(technician_id, service_id, service_started, service_finished) " +
-                        "values(?, ?, ?, ?)";
+                "insert into tbl_appointments(appointment_id, technician_id, service_id, service_started, service_finished, week_number) " +
+                        "values(?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sqlQuery, ps -> {
-            ps.setString(1, appointment.getTechnicianId());
-            ps.setString(2, appointment.getServiceId());
-            ps.setObject(3, appointment.getServiceStarted());
-            ps.setObject(4, appointment.getServiceFinished());
+            ps.setString(1, appointment.getAppointmentId().toString());
+            ps.setString(2, appointment.getTechnicianId().toString());
+            ps.setString(3, appointment.getServiceId().toString());
+            ps.setObject(4, appointment.getServiceStarted());
+            ps.setObject(5, appointment.getServiceFinished());
+            ps.setInt(6, appointment.getWeekNumber().asInteger());
         });
     }
 
     @Override
     public void updateAppointment(Appointment appointment) {
         String sqlQuery =
-                "update tbl_appointments set service_started = ?, service_finished = ? where service_id = ?";
+                "update tbl_appointments set service_started = ?, service_finished = ?, week_number = ? where appointment_id = ?";
         jdbcTemplate.update(sqlQuery, ps -> {
             ps.setObject(1, appointment.getServiceStarted());
             ps.setObject(2, appointment.getServiceFinished());
-            ps.setObject(3, appointment.getServiceId());
+            ps.setInt(3, appointment.getWeekNumber().asInteger());
+            ps.setString(4, appointment.getAppointmentId().toString());
         });
     }
 
     @Override
-    public void deleteAppointment(String serviceIdId) {
-        String sqlQuery = "delete from tbl_appointments where service_id = ?";
-        jdbcTemplate.update(sqlQuery, serviceIdId);
+    public void deleteAppointment(AppointmentId appointmentId) {
+        String sqlQuery = "delete from tbl_appointments where appointment_id = ?";
+        jdbcTemplate.update(sqlQuery, appointmentId.toString());
     }
 }

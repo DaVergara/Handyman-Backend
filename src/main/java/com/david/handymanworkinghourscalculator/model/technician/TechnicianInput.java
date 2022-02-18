@@ -1,12 +1,15 @@
-package com.david.handymanworkinghourscalculator.model;
+package com.david.handymanworkinghourscalculator.model.technician;
 
-public class Technician {
+public class TechnicianInput {
 
     private String technicianId;
     private String technicianName;
     private String technicianLastName;
 
-    public Technician(String technicianId, String technicianName, String technicianLastName) {
+    public TechnicianInput() {
+    }
+
+    public TechnicianInput(String technicianId, String technicianName, String technicianLastName) {
         this.technicianId = technicianId;
         this.technicianName = technicianName;
         this.technicianLastName = technicianLastName;

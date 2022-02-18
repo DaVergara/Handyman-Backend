@@ -1,6 +1,11 @@
 package com.david.handymanworkinghourscalculator.controller;
 
-import com.david.handymanworkinghourscalculator.model.Technician;
+import com.david.handymanworkinghourscalculator.domain.technician.Technician;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianId;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianLastName;
+import com.david.handymanworkinghourscalculator.domain.technician.TechnicianName;
+import com.david.handymanworkinghourscalculator.model.technician.TechnicianInput;
+import com.david.handymanworkinghourscalculator.model.technician.TechnicianOutput;
 import com.david.handymanworkinghourscalculator.service.TechnicianService;
 import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.http.HttpStatus;
@@ -28,7 +33,8 @@ public class TechnicianController {
     }
 
     @GetMapping("/{technicianId}")
-    public ResponseEntity<Technician> getTechnicianById(@PathVariable("technicianId") String technicianId) {
+    public ResponseEntity<Technician> getTechnicianById(@PathVariable("technicianId") TechnicianId technicianId) {
+        System.out.println(technicianId.toString());
         try {
             Technician technician = service.getTechnicianById(technicianId);
             return new ResponseEntity<>(technician, HttpStatus.OK);
@@ -38,32 +44,69 @@ public class TechnicianController {
     }
 
     @PostMapping
-    public ResponseEntity<Technician> addTechnician(@RequestBody Technician technician) {
+    public ResponseEntity<TechnicianOutput> addTechnician(@RequestBody TechnicianInput input) {
         try {
+            TechnicianId technicianId = new TechnicianId(input.getTechnicianId());
+            TechnicianName technicianName = new TechnicianName(input.getTechnicianName());
+            TechnicianLastName technicianLastName = new TechnicianLastName(input.getTechnicianLastName());
+
+            Technician technician = new Technician(
+                    technicianId,
+                    technicianName,
+                    technicianLastName
+            );
+
             Technician addedTechnician = service.addTechnician(technician);
-            return new ResponseEntity<>(addedTechnician, HttpStatus.OK);
+            TechnicianOutput output = new TechnicianOutput(addedTechnician);
+
+            return new ResponseEntity<>(output, HttpStatus.OK);
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage(),
+                    exception
+            );
         } catch (Exception exception) {
-            System.out.println("Hola");
-            throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Technician with id: " + technician.getTechnicianId() + " already exist.",
-                    exception);
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Technician with id: " + input.getTechnicianId() + " already exist.",
+                    exception
+            );
         }
     }
 
     @PutMapping
-    public ResponseEntity<Technician> updateTechnician(@RequestBody Technician technician) {
+    public ResponseEntity<TechnicianOutput> updateTechnician(@RequestBody TechnicianInput input) {
         try {
+            TechnicianId technicianId = new TechnicianId(input.getTechnicianId());
+            TechnicianName technicianName = new TechnicianName(input.getTechnicianName());
+            TechnicianLastName technicianLastName = new TechnicianLastName(input.getTechnicianLastName());
+
+            Technician technician = new Technician(
+                    technicianId,
+                    technicianName,
+                    technicianLastName
+            );
+
             Technician updatedTechnician = service.updateTechnician(technician);
-            return new ResponseEntity<>(updatedTechnician, HttpStatus.OK);
+            TechnicianOutput output = new TechnicianOutput(updatedTechnician);
+
+            return new ResponseEntity<>(output, HttpStatus.OK);
+        } catch (IllegalArgumentException | NullPointerException exception) {
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    exception.getMessage(),
+                    exception
+            );
         } catch (EmptyResultDataAccessException exception) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST,
-                    "Technician with id: " + technician.getTechnicianId() + " not found.",
+                    "Technician with id: " + input.getTechnicianId() + " not found.",
                     exception);
         }
     }
 
     @DeleteMapping("/{technicianId}")
-    public ResponseEntity<?> deleteTechnician(@PathVariable("technicianId") String technicianId) {
+    public ResponseEntity<?> deleteTechnician(@PathVariable("technicianId") TechnicianId technicianId) {
         service.deleteTechnician(technicianId);
         return new ResponseEntity<>(HttpStatus.OK);
     }

@@ -1,6 +1,5 @@
-package com.david.handymanworkinghourscalculator.model;
+package com.david.handymanworkinghourscalculator.domain;
 
-import java.math.BigDecimal;
 import java.util.HashMap;
 
 public class HoursWorked {
