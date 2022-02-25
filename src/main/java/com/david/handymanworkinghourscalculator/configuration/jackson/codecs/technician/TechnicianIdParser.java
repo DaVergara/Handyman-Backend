@@ -16,7 +16,8 @@ public class TechnicianIdParser {
     public static class Serializer extends JsonSerializer<TechnicianId> {
 
         @Override
-        public void serialize(TechnicianId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        public void serialize(TechnicianId value, JsonGenerator gen, SerializerProvider serializers)
+                throws IOException {
             gen.writeString(value.toString());
         }
     }
@@ -24,7 +25,8 @@ public class TechnicianIdParser {
     public static class Deserializer extends JsonDeserializer<TechnicianId> {
 
         @Override
-        public TechnicianId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+        public TechnicianId deserialize(JsonParser p, DeserializationContext ctxt)
+                throws IOException, JacksonException {
             return new TechnicianId(p.getValueAsString());
         }
     }

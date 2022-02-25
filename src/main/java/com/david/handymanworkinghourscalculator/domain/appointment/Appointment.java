@@ -2,9 +2,11 @@ package com.david.handymanworkinghourscalculator.domain.appointment;
 
 import com.david.handymanworkinghourscalculator.domain.service.ServiceId;
 import com.david.handymanworkinghourscalculator.domain.technician.TechnicianId;
+import lombok.Data;
 
 import java.time.LocalDateTime;
 
+@Data
 public class Appointment {
 
     private final AppointmentId appointmentId;
@@ -14,7 +16,14 @@ public class Appointment {
     private final LocalDateTime serviceFinished;
     private final WeekNumber weekNumber;
 
-    public Appointment(AppointmentId appointmentId, TechnicianId technicianId, ServiceId serviceId, LocalDateTime serviceStarted, LocalDateTime serviceFinished, WeekNumber weekNumber) {
+    public Appointment(
+            AppointmentId appointmentId,
+            TechnicianId technicianId,
+            ServiceId serviceId,
+            LocalDateTime serviceStarted,
+            LocalDateTime serviceFinished,
+            WeekNumber weekNumber
+    ) {
 
         if (serviceStarted.isAfter(serviceFinished)
                 || serviceStarted.isEqual(serviceFinished)) {
@@ -27,29 +36,5 @@ public class Appointment {
         this.serviceStarted = serviceStarted;
         this.serviceFinished = serviceFinished;
         this.weekNumber = weekNumber;
-    }
-
-    public AppointmentId getAppointmentId() {
-        return appointmentId;
-    }
-
-    public TechnicianId getTechnicianId() {
-        return technicianId;
-    }
-
-    public ServiceId getServiceId() {
-        return serviceId;
-    }
-
-    public LocalDateTime getServiceStarted() {
-        return serviceStarted;
-    }
-
-    public LocalDateTime getServiceFinished() {
-        return serviceFinished;
-    }
-
-    public WeekNumber getWeekNumber() {
-        return weekNumber;
     }
 }

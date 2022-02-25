@@ -1,20 +1,14 @@
 package com.david.handymanworkinghourscalculator.domain;
 
+import lombok.AllArgsConstructor;
+import lombok.Data;
+
 import java.util.HashMap;
 
+@Data
+@AllArgsConstructor
 public class HoursWorked {
 
     private HashMap<String, Integer> hoursWorked;
 
-    public HoursWorked(HashMap<String, Integer> hoursWorked) {
-        this.hoursWorked = hoursWorked;
-    }
-
-    public HashMap<String, Integer> getHoursWorked() {
-        return hoursWorked;
-    }
-
-    public void setHoursWorked(HashMap<String, Integer> hoursWorked) {
-        this.hoursWorked = hoursWorked;
-    }
 }

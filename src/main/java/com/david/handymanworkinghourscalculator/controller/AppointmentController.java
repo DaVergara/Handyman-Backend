@@ -46,14 +46,17 @@ public class AppointmentController {
     @GetMapping("/technician/{technicianId}/week/{weekNumber}")
     public ResponseEntity<List<Appointment>> getAppointmentsByTechnicianIdWeekNumber(
             @PathVariable("technicianId") TechnicianId technicianId,
-            @PathVariable("weekNumber") int weekNumber
+            @PathVariable("weekNumber") WeekNumber weekNumber
     ) {
-        List<Appointment> appointments = service.getAppointmentsByTechnicianIdWeekNumber(technicianId, new WeekNumber(weekNumber));
+        List<Appointment> appointments = service.getAppointmentsByTechnicianIdWeekNumber(
+                technicianId,
+                weekNumber        );
         return new ResponseEntity<>(appointments, HttpStatus.OK);
     }
 
     @GetMapping("/appointment/{appointmentId}")
-    public ResponseEntity<Appointment> getAppointmentByAppointmentId(@PathVariable("appointmentId") AppointmentId appointmentId) {
+    public ResponseEntity<Appointment> getAppointmentByAppointmentId(
+            @PathVariable("appointmentId") AppointmentId appointmentId) {
         try {
             Appointment appointment = service.getAppointmentsByAppointmentId(appointmentId);
             return new ResponseEntity<>(appointment, HttpStatus.OK);

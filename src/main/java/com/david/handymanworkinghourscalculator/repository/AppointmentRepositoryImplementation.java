@@ -14,7 +14,7 @@ import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @Repository
-public class AppointmentRepositoryImplementation implements AppointmentRepository{
+public class AppointmentRepositoryImplementation implements AppointmentRepository {
 
     private final JdbcTemplate jdbcTemplate;
 
@@ -57,7 +57,9 @@ public class AppointmentRepositoryImplementation implements AppointmentRepositor
 
     @Override
     public List<Appointment> getAppointmentsByTechnicianIdWeekNumber(TechnicianId technicianId, WeekNumber weekNumber) {
-        String sqlQuery = "select * from tbl_appointments where technician_id = ? and week_number = ? order by service_started ASC";
+        String sqlQuery
+                = "select * from tbl_appointments where technician_id = ? and week_number = ? " +
+                "order by service_started ASC";
         return jdbcTemplate.query(sqlQuery, rowMapper, technicianId.toString(), weekNumber.asInteger());
     }
 
@@ -69,9 +71,10 @@ public class AppointmentRepositoryImplementation implements AppointmentRepositor
 
     @Override
     public void addAppointment(Appointment appointment) {
-        String sqlQuery =
-                "insert into tbl_appointments(appointment_id, technician_id, service_id, service_started, service_finished, week_number) " +
-                        "values(?, ?, ?, ?, ?, ?)";
+        String sqlQuery
+                = "insert into tbl_appointments" +
+                "(appointment_id, technician_id, service_id, service_started, service_finished, week_number) " +
+                "values(?, ?, ?, ?, ?, ?)";
         jdbcTemplate.update(sqlQuery, ps -> {
             ps.setString(1, appointment.getAppointmentId().toString());
             ps.setString(2, appointment.getTechnicianId().toString());
@@ -85,7 +88,8 @@ public class AppointmentRepositoryImplementation implements AppointmentRepositor
     @Override
     public void updateAppointment(Appointment appointment) {
         String sqlQuery =
-                "update tbl_appointments set service_started = ?, service_finished = ?, week_number = ? where appointment_id = ?";
+                "update tbl_appointments set service_started = ?, service_finished = ?, week_number = ? " +
+                        "where appointment_id = ?";
         jdbcTemplate.update(sqlQuery, ps -> {
             ps.setObject(1, appointment.getServiceStarted());
             ps.setObject(2, appointment.getServiceFinished());

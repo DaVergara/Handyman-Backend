@@ -35,7 +35,8 @@ public class HoursWorkedService {
             hoursWorkedMap.put("Horas Nocturnas Extra", 0);
             hoursWorkedMap.put("Horas Dominicales Extra", 0);
 
-            List<Appointment> appointments = appointmentService.getAppointmentsByTechnicianIdWeekNumber(technicianId, weekNumber);
+            List<Appointment> appointments
+                    = appointmentService.getAppointmentsByTechnicianIdWeekNumber(technicianId, weekNumber);
 
             appointments.forEach(appointment -> {
                 Duration duration = Duration.between(
@@ -127,7 +128,8 @@ public class HoursWorkedService {
                                     startDateTimeFlag.toLocalDate().atTime(0, 0).plusDays(1)
                             );
                             timeWorked -= (int) Duration
-                                    .between(startDateTimeFlag, startDateTimeFlag.toLocalDate().atTime(0, 0).plusDays(1))
+                                    .between(startDateTimeFlag, startDateTimeFlag.toLocalDate().atTime(0, 0)
+                                            .plusDays(1))
                                     .toMinutes();
                             startDateTimeFlag = startDateTimeFlag.toLocalDate().atTime(0, 0).plusDays(1);
                         }
@@ -172,8 +174,10 @@ public class HoursWorkedService {
         //Between 20:00 and 00:00
         return serviceStarted.plusNanos(1).isAfter(serviceStarted.toLocalDate().atTime(20, 0))
                 && serviceFinished.plusNanos(1).isAfter(serviceStarted.toLocalDate().atTime(20, 0))
-                && serviceStarted.minusNanos(1).isBefore(serviceStarted.toLocalDate().atTime(0, 0).plusDays(1))
-                && serviceFinished.minusNanos(1).isBefore(serviceStarted.toLocalDate().atTime(0, 0).plusDays(1));
+                && serviceStarted.minusNanos(1).isBefore(serviceStarted.toLocalDate().atTime(0, 0)
+                .plusDays(1))
+                && serviceFinished.minusNanos(1).isBefore(serviceStarted.toLocalDate().atTime(0, 0)
+                .plusDays(1));
     }
 
     private int overTime(HashMap<String, Integer> hoursWorkedMap) {

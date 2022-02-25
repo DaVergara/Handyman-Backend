@@ -30,6 +30,10 @@ dependencies {
 	// https://mvnrepository.com/artifact/com.h2database/h2
 	testImplementation 'com.h2database:h2:2.1.210'
 
+	// https://mvnrepository.com/artifact/org.projectlombok/lombok
+	compileOnly 'org.projectlombok:lombok'
+	annotationProcessor 'org.projectlombok:lombok:1.18.22'
+
 }
 
 tasks.named('test') {

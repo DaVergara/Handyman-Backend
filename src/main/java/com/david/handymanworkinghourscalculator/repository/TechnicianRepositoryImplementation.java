@@ -22,7 +22,8 @@ public class TechnicianRepositoryImplementation implements TechnicianRepository 
     private final RowMapper<Technician> rowMapper = (resultSet, rowNum) -> {
         TechnicianId technicianId = new TechnicianId(resultSet.getString("technician_id"));
         TechnicianName technicianName = new TechnicianName(resultSet.getString("technician_name"));
-        TechnicianLastName technicianLastName = new TechnicianLastName(resultSet.getString("technician_lastname"));
+        TechnicianLastName technicianLastName
+                = new TechnicianLastName(resultSet.getString("technician_lastname"));
 
         return new Technician(
                 technicianId,

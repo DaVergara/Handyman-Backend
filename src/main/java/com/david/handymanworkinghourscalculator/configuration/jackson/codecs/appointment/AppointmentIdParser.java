@@ -17,7 +17,8 @@ public class AppointmentIdParser {
     public static class Serializer extends JsonSerializer<AppointmentId> {
 
         @Override
-        public void serialize(AppointmentId value, JsonGenerator gen, SerializerProvider serializers) throws IOException {
+        public void serialize(AppointmentId value, JsonGenerator gen, SerializerProvider serializers)
+                throws IOException {
             gen.writeString(value.toString());
         }
     }
@@ -25,7 +26,8 @@ public class AppointmentIdParser {
     public static class Deserializer extends JsonDeserializer<AppointmentId> {
 
         @Override
-        public AppointmentId deserialize(JsonParser p, DeserializationContext ctxt) throws IOException, JacksonException {
+        public AppointmentId deserialize(JsonParser p, DeserializationContext ctxt)
+                throws IOException, JacksonException {
             return new AppointmentId(p.getValueAsString());
         }
     }

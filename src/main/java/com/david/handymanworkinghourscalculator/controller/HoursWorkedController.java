@@ -21,20 +21,18 @@ import java.util.List;
 @RequestMapping("/hours_worked")
 public class HoursWorkedController {
 
-    private final HoursWorkedService hoursWorkedService;
-    private final AppointmentService appointmentService;
+    private final HoursWorkedService service;
 
-    public HoursWorkedController(HoursWorkedService hoursWorkedService, AppointmentService appointmentService) {
-        this.hoursWorkedService = hoursWorkedService;
-        this.appointmentService = appointmentService;
+    public HoursWorkedController(HoursWorkedService hoursWorkedService) {
+        this.service = hoursWorkedService;
     }
 
     @GetMapping("/technician/{technicianId}/week/{weekNumber}")
     ResponseEntity<HoursWorked> getHoursWorked(
-            @PathVariable("technicianId") TechnicianId technicianId, @PathVariable("weekNumber") int weekNumber
+            @PathVariable("technicianId") TechnicianId technicianId, @PathVariable("weekNumber") WeekNumber weekNumber
     ) {
         try {
-            HoursWorked hoursWorked = hoursWorkedService.getHoursWorked(technicianId, new WeekNumber(weekNumber));
+            HoursWorked hoursWorked = service.getHoursWorked(technicianId, weekNumber);
             return new ResponseEntity<>(hoursWorked, HttpStatus.OK);
         } catch (TechnicianNotFoundException exception) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, exception.getMessage(), exception);
